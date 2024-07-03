@@ -2,11 +2,10 @@ package main
 
 import (
 	"bufio"
-	"errors"
-	"flag"
 	"fmt"
 	"io"
 	"os"
+	"strings"
 	"todo"
 )
 
@@ -15,86 +14,93 @@ const (
 )
 
 func main() {
-	add := flag.Bool("add", false, "add a new todo")
-	complete := flag.Int("complete", 0, "mark completed todo")
-	delete := flag.Int("delete", 0, "delete a todo")
-	list := flag.Bool("list", false, "List all todos")
 
-	flag.Parse()
+	fmt.Print(`Commans for using: 
+	-add : To add a new todo
+	-complete number : To mark completed todo by number
+	-delete number : Delete a todo by number
+	-list : List all todos 
+	-quit - To quit from the programm
+	`)
 
-	todos := &todo.Todos{}
+	for {
+		todos := &todo.Todos{}
 
-	if err := todos.Load(todoFile); err != nil {
-		fmt.Fprintln(os.Stderr, err.Error())
-		os.Exit(1)
-	}
-
-	switch {
-	case *add:
-		task, description, err := getInput(os.Stdin, flag.Args()...)
-		if err != nil {
+		if err := todos.Load(todoFile); err != nil {
 			fmt.Fprintln(os.Stderr, err.Error())
 			os.Exit(1)
 		}
 
-		todos.Add(task, description)
-		err = todos.Store(todoFile)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err.Error())
+		var str string
+		fmt.Scan(&str)
+		switch {
+		case str == "add":
+			task, description, err := getInput(os.Stdin)
+			if err != nil {
+				fmt.Fprintln(os.Stderr, err.Error())
+				os.Exit(1)
+			}
+
+			todos.Add(task, description)
+			err = todos.Store(todoFile)
+			if err != nil {
+				fmt.Fprintln(os.Stderr, err.Error())
+				os.Exit(1)
+			}
+		case str == "complete":
+			fmt.Println("Enter the position of the mark: ")
+			var position int
+			fmt.Scan(&position)
+			err := todos.Complete(position)
+
+			if err != nil {
+				fmt.Fprintln(os.Stdout, err)
+				os.Exit(1)
+			}
+
+			todos.Store(todoFile)
+
+		case str == "delete":
+			fmt.Println("Enter the position of the mark: ")
+			var position int
+			fmt.Scan(&position)
+			err := todos.Delete(position)
+
+			if err != nil {
+				fmt.Fprintln(os.Stdout, err)
+				os.Exit(1)
+			}
+
+			todos.Store(todoFile)
+		case str == "list":
+			todos.Print()
+		case str == "quit":
+			fmt.Println("Quiting from the programm...")
 			os.Exit(1)
+		default:
+			fmt.Fprintln(os.Stdout, "invalid command")
 		}
-	case *complete > 0:
-		err := todos.Complete(*complete)
-
-		if err != nil {
-			fmt.Fprintln(os.Stdout, err)
-			os.Exit(1)
-		}
-
-		todos.Store(todoFile)
-
-	case *delete > 0:
-		err := todos.Delete(*delete)
-
-		if err != nil {
-			fmt.Fprintln(os.Stdout, err)
-			os.Exit(1)
-		}
-
-		todos.Store(todoFile)
-	case *list:
-		todos.Print()
-	default:
-		fmt.Fprintln(os.Stdout, "invalid comand")
-		os.Exit(1)
 	}
 }
 
-func getInput(r io.Reader, args ...string) (string, string, error) {
-
-	var task, description string
+func getInput(r io.Reader) (string, string, error) {
+	reader := bufio.NewReader(r)
 
 	fmt.Print("Enter task: ")
-	scanner := bufio.NewScanner(r)
-	scanner.Scan()
-
-	if err := scanner.Err(); err != nil {
-		return "", "", nil
+	task, err := reader.ReadString('\n')
+	if err != nil {
+		return "", "", err
 	}
-
-	task = scanner.Text()
 
 	fmt.Print("Enter description: ")
-	scanner.Scan()
-
-	if err := scanner.Err(); err != nil {
-		return "", "", nil
+	description, err := reader.ReadString('\n')
+	if err != nil {
+		return "", "", err
 	}
-	description = scanner.Text()
 
-	if len(task) == 0 {
-		return "", "", errors.New("empty todo")
-	}
+	// Удаление символов новой строки из task и description
+	task = strings.TrimSuffix(task, "\n")
+	description = strings.TrimSuffix(description, "\n")
 
 	return task, description, nil
 }
