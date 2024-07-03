@@ -16,11 +16,11 @@ const (
 func main() {
 
 	fmt.Print(`Commans for using: 
-	-add : To add a new todo
-	-complete number : To mark completed todo by number
-	-delete number : Delete a todo by number
-	-list : List all todos 
-	-quit - To quit from the programm
+	add : To add a new todo
+	complete number : To mark completed todo by number
+	delete number : Delete a todo by number
+	list : List all todos 
+	quit - To quit from the programm
 	`)
 
 	for {
