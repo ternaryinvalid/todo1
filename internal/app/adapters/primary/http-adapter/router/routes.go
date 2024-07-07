@@ -25,7 +25,7 @@ func (r *Router) AppendRoutes(config config.Router, ctr *api_controller.Controll
 			Name:    "/todo/get",
 			Path:    "/todo/get",
 			Method:  http.MethodPost,
-			Handler: authMiddleware.AuthMiddleware(http.HandlerFunc(ctr.GetTODO)),
+			Handler: authMiddleware.AuthMiddleware(http.HandlerFunc(ctr.GetAllTODO)),
 		},
 		{
 			Name:    "/todo/delete",
