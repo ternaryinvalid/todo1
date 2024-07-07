@@ -1,0 +1,23 @@
+application:
+  name: "todo-app"
+  version: "1.0.0"
+
+adapters:
+  primary:
+    httpAdapter:
+      server:
+        port: ":8080"
+      router:
+        shutdown:
+          duration: 15s
+        timeout:
+          duration: 60s
+  secondary:
+    databases:
+      todo:
+        host: "TODO_HOST"
+        port: "TODO_PORT"
+        type: "postgres"
+        name: "todo"
+        user: "TODO_USER"
+        password: "TODO_PASSWORD"
