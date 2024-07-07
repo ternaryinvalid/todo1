@@ -1,21 +1,21 @@
 package todo_repository
 
-func (t TodoRepository) Create() {
+import (
+	"context"
+	"github.com/ternaryinvalid/todo1/internal/app/domain/todo"
+)
+
+func (repo *TodoRepository) CreateTODO(ctx context.Context, req todo.CreateTaskRequest) (id int, err error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (t TodoRepository) Update() {
+func (repo *TodoRepository) GetAllTODO(ctx context.Context, userID int) (tasks []todo.Task, err error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (t TodoRepository) Get() {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (t TodoRepository) Delete() {
+func (repo *TodoRepository) DeleteTODO(ctx context.Context, req todo.DeleteTaskRequest) (err error) {
 	//TODO implement me
 	panic("implement me")
 }
