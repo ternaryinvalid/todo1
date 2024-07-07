@@ -2,8 +2,10 @@ package auth_service
 
 import (
 	"context"
-	"github.com/dgrijalva/jwt-go"
 	"net/http"
+	"time"
+
+	"github.com/dgrijalva/jwt-go"
 )
 
 // AuthMiddleware функция для проверки JWT
@@ -35,4 +37,23 @@ func (svc *AuthService) AuthMiddleware(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+// GenerateJWT генерирует JWT токен для пользователя
+func (svc *AuthService) GenerateJWT(userID int, username string) (string, error) {
+	expirationTime := time.Now().Add(24 * time.Hour)
+	claims := &Claims{
+		Username: username,
+		UserID:   userID,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: expirationTime.Unix(),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString(svc.jwtSecret)
+	if err != nil {
+		return "", err
+	}
+	return tokenString, nil
 }
