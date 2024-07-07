@@ -16,10 +16,28 @@ func (r *Router) AppendRoutes(config config.Router, ctr *api_controller.Controll
 
 	routes := []Route{
 		{
-			Name:    "/reports/get",
-			Path:    "/reports/get",
+			Name:    "/todo/create",
+			Path:    "/todo/create",
 			Method:  http.MethodPost,
-			Handler: authMiddleware.AuthMiddleware(),
+			Handler: authMiddleware.AuthMiddleware(http.HandlerFunc(ctr.CreateTODO)),
+		},
+		{
+			Name:    "/todo/get",
+			Path:    "/todo/get",
+			Method:  http.MethodPost,
+			Handler: authMiddleware.AuthMiddleware(http.HandlerFunc(ctr.GetTODO)),
+		},
+		{
+			Name:    "/todo/delete",
+			Path:    "/todo/delete",
+			Method:  http.MethodPost,
+			Handler: authMiddleware.AuthMiddleware(http.HandlerFunc(ctr.DeleteTODO)),
+		},
+		{
+			Name:    "/auth",
+			Path:    "/auth",
+			Method:  http.MethodPost,
+			Handler: http.HandlerFunc(ctr.SignUP),
 		},
 	}
 

@@ -4,7 +4,6 @@ import (
 	api_controller "github.com/ternaryinvalid/todo1/internal/app/adapters/primary/http-adapter/api-controller"
 	"github.com/ternaryinvalid/todo1/internal/app/adapters/primary/http-adapter/router"
 	api_service "github.com/ternaryinvalid/todo1/internal/app/application/api-service"
-	auth_service "github.com/ternaryinvalid/todo1/internal/app/application/auth-service"
 	"github.com/ternaryinvalid/todo1/internal/app/domain/config"
 	"net/http"
 	"time"
@@ -25,10 +24,10 @@ type HttpAdapter struct {
 	notify          chan error
 }
 
-func New(config config.HttpAdapter, svc *api_service.ApiService, svcAuth *auth_service.AuthService) HttpAdapter {
+func New(config config.HttpAdapter, svc *api_service.ApiService) HttpAdapter {
 	r := router.New()
 
-	ctr := api_controller.New(svc, svcAuth)
+	ctr := api_controller.New(svc)
 
 	r.AppendRoutes(config.Router, ctr)
 
