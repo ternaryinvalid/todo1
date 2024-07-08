@@ -16,6 +16,8 @@ func main() {
 	// Initialize Repositories
 	todoRepository := todo_repository.New(cfg.Adapters.Secondary.Databases.Todo)
 
+	todoRepository.Init()
+
 	// Initialize Services
 	authService := auth_service.New(cfg.Services.AuthJWT.JWTSecret)
 	apiService := api_service.New(todoRepository, todoRepository, authService)

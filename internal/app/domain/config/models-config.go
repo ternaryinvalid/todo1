@@ -3,44 +3,44 @@ package config
 import "time"
 
 type Config struct {
-	Application Application
-	Adapters    Adapters
-	Services    Services
+	Application Application `yaml:"application"`
+	Adapters    Adapters    `yaml:"adapters"`
+	Services    Services    `yaml:"services"`
 }
 
 type Services struct {
-	AuthJWT AuthJWT
+	AuthJWT AuthJWT `yaml:"authJWT"`
 }
 
 type AuthJWT struct {
-	JWTSecret string `config:"envVar"`
+	JWTSecret string `yaml:"jwtSecret"`
 }
 
 type Application struct {
-	Name    string
-	Version string
+	Name    string `yaml:"name"`
+	Version string `yaml:"version"`
 }
 
 type Adapters struct {
-	Primary   Primary
-	Secondary Secondary
+	Primary   Primary   `yaml:"primary"`
+	Secondary Secondary `yaml:"secondary"`
 }
 
 type Secondary struct {
-	Databases Databases
+	Databases Databases `yaml:"databases"`
 }
 
 type Primary struct {
-	HttpAdapter HttpAdapter
+	HttpAdapter HttpAdapter `yaml:"httpAdapter"`
 }
 
 type Database struct {
-	Host     string `config:"envVar"`
-	Port     string `config:"envVar"`
-	Type     string
-	Name     string
-	User     string `config:"envVar"`
-	Password string `config:"envVar"`
+	Host     string `yaml:"host"`
+	Port     string `yaml:"port"`
+	Type     string `yaml:"type"`
+	Name     string `yaml:"name"`
+	User     string `yaml:"user"`
+	Password string `yaml:"password"`
 }
 
 type HttpAdapter struct {
@@ -49,23 +49,23 @@ type HttpAdapter struct {
 }
 
 type Server struct {
-	Port string
+	Port string `yaml:"port"`
 }
 
 type Router struct {
-	Shutdown            shutdown
-	Timeout             timeout
-	AuthorizationConfig string `config:"envVar"`
+	Shutdown            shutdown `yaml:"shutdown"`
+	Timeout             timeout  `yaml:"timeout"`
+	AuthorizationConfig string   `yaml:"authorizationConfig"`
 }
 
 type shutdown struct {
-	Duration time.Duration
+	Duration time.Duration `yaml:"duration"`
 }
 
 type timeout struct {
-	Duration time.Duration
+	Duration time.Duration `yaml:"duration"`
 }
 
 type Databases struct {
-	Todo Database
+	Todo Database `yaml:"todo"`
 }

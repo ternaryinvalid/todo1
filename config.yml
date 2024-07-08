@@ -4,7 +4,7 @@ application:
 
 services:
   authJWT:
-    jWTSecret: "JWT_SECRET"
+    jwtSecret: "Esf/l3DQVw2Rc+SxlnaJiauLrlaax6yjRHx3hTQ9VmA="
 
 
 adapters:
@@ -13,6 +13,7 @@ adapters:
       server:
         port: ":8080"
       router:
+        authorizationConfig: "Esf/l3DQVw2Rc+SxlnaJiauLrlaax6yjRHx3hTQ9VmA="
         shutdown:
           duration: 15s
         timeout:
@@ -20,9 +21,9 @@ adapters:
   secondary:
     databases:
       todo:
-        host: "TODO_HOST"
-        port: "TODO_PORT"
+        host: "localhost"
+        port: "5588"
         type: "postgres"
         name: "todo"
-        user: "TODO_USER"
-        password: "TODO_PASSWORD"
+        user: "user_admin"
+        password: "admin123"

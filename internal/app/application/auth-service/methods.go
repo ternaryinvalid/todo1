@@ -3,6 +3,7 @@ package auth_service
 import (
 	"context"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -11,9 +12,15 @@ import (
 // AuthMiddleware функция для проверки JWT
 func (svc *AuthService) AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		tokenStr := r.Header.Get("Authorization")
-		if tokenStr == "" {
+		authHeader := r.Header.Get("Authorization")
+		if authHeader == "" {
 			http.Error(w, "Missing token", http.StatusUnauthorized)
+			return
+		}
+
+		tokenStr := extractTokenFromHeader(authHeader)
+		if tokenStr == "" {
+			http.Error(w, "Invalid token format", http.StatusUnauthorized)
 			return
 		}
 
@@ -23,11 +30,12 @@ func (svc *AuthService) AuthMiddleware(next http.Handler) http.Handler {
 			tokenStr,
 			claims,
 			func(token *jwt.Token) (interface{}, error) {
-				return svc.jwtSecret, nil
+				return []byte(svc.jwtSecret), nil
 			},
 		)
 		if err != nil || !token.Valid {
 			http.Error(w, "Invalid token", http.StatusUnauthorized)
+
 			return
 		}
 
@@ -51,9 +59,17 @@ func (svc *AuthService) GenerateJWT(userID int, username string) (string, error)
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(svc.jwtSecret)
+	tokenString, err := token.SignedString([]byte(svc.jwtSecret))
 	if err != nil {
 		return "", err
 	}
 	return tokenString, nil
+}
+
+func extractTokenFromHeader(authHeader string) string {
+	parts := strings.Split(authHeader, " ")
+	if len(parts) != 2 || parts[0] != "Bearer" {
+		return ""
+	}
+	return parts[1]
 }

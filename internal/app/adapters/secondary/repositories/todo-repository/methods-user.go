@@ -6,6 +6,21 @@ import (
 )
 
 func (repo *TodoRepository) CreateUser(ctx context.Context, req user.TodoUserCreateRequest) (userID int, err error) {
-	//TODO implement me
-	panic("implement me")
+	query, args, err := createUserQuery(req)
+	if err != nil {
+		return 0, err
+	}
+
+	var dto userIdDTO
+
+	err = repo.DB.GetContext(ctx, &dto, query, args...)
+	if err != nil {
+		return 0, err
+	}
+
+	return dto.UserID, nil
+}
+
+type userIdDTO struct {
+	UserID int `db:"user_id"`
 }
