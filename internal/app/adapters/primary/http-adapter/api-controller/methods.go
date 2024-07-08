@@ -23,7 +23,7 @@ func (ctr *Controller) SignUP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 
-		http.Error(w, "Error creating user", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 
 		return
 	}
