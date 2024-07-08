@@ -1,0 +1,29 @@
+application:
+  name: "todo-app"
+  version: "1.0.0"
+
+services:
+  authJWT:
+    jwtSecret: "Esf/l3DQVw2Rc+SxlnaJiauLrlaax6yjRHx3hTQ9VmA="
+
+
+adapters:
+  primary:
+    httpAdapter:
+      server:
+        port: ":8080"
+      router:
+        authorizationConfig: "Esf/l3DQVw2Rc+SxlnaJiauLrlaax6yjRHx3hTQ9VmA="
+        shutdown:
+          duration: 15s
+        timeout:
+          duration: 60s
+  secondary:
+    databases:
+      todo:
+        host: "localhost"
+        port: "5588"
+        type: "postgres"
+        name: "todo"
+        user: "user_admin"
+        password: "admin123"
