@@ -32,3 +32,12 @@ func (svc *ApiService) GetAllTODO(ctx context.Context, userID int) (tasks []todo
 
 	return tasks, nil
 }
+
+func (svc *ApiService) Done(ctx context.Context, req todo.DoneTaskRequest) (err error) {
+	err = svc.todoRepository.Done(ctx, req)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

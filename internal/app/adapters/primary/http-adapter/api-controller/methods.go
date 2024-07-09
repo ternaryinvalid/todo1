@@ -97,7 +97,7 @@ func (ctr *Controller) DeleteTODO(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 
-		http.Error(w, "Error creating task", http.StatusInternalServerError)
+		http.Error(w, "Error deleting task", http.StatusInternalServerError)
 
 		return
 	}
@@ -123,8 +123,36 @@ func (ctr *Controller) GetAllTODO(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 
-		http.Error(w, "Error creating user", http.StatusInternalServerError)
+		http.Error(w, "Error getting task", http.StatusInternalServerError)
 
 		return
 	}
+}
+
+func (ctr *Controller) Done(w http.ResponseWriter, r *http.Request) {
+	userID := r.Context().Value("userID").(int)
+
+	var req todo.DoneTaskRequest
+
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+
+		return
+	}
+
+	req.UserID = userID
+
+	ctx := r.Context()
+
+	err = ctr.service.Done(ctx, req)
+	if err != nil {
+		log.Println(err)
+
+		http.Error(w, "Error done task", http.StatusInternalServerError)
+
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
 }

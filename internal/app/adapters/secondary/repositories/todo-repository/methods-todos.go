@@ -2,39 +2,45 @@ package todo_repository
 
 import (
 	"context"
+	"log"
 
 	"github.com/ternaryinvalid/todo1/internal/app/domain/todo"
 )
 
 func (repo *TodoRepository) CreateTODO(ctx context.Context, req todo.CreateTaskRequest) (id int, err error) {
-	result, err := repo.DB.ExecContext(ctx, "INSERT INTO tasks (title, description, user_id) VALUES (?, ?, ?)", req.Title, req.Description, req.UserID)
-
+	query, args, err := createTaskQuery(req)
 	if err != nil {
 		return 0, nil
 	}
 
-	lastInsertID, err := result.LastInsertId()
+	var taskIdDto taskIDDTO
 
+	err = repo.DB.GetContext(ctx, &taskIdDto, query, args...)
 	if err != nil {
 		return 0, err
 	}
 
-	return int(lastInsertID), nil
+	return taskIdDto.TaskId, nil
 }
 
 func (repo *TodoRepository) GetAllTODO(ctx context.Context, userID int) (tasks []todo.Task, err error) {
-	rows, err := repo.DB.QueryContext(ctx, "SELECT id, title, description FROM tasks WHERE user_id = ?", userID)
+	rows, err := repo.DB.QueryContext(ctx, "SELECT t.task_id, t.title, t.description, t.estimated_date, t.done FROM todo.tasks t WHERE t.user_id = $1", userID)
 
 	if err != nil {
 		return nil, err
 	}
 
-	defer rows.Close()
+	defer func() {
+		dbErr := rows.Close()
+		if dbErr != nil {
+			log.Println(dbErr)
+		}
+	}()
 
 	var taskList []todo.Task
 	for rows.Next() {
 		var task todo.Task
-		err := rows.Scan(&task.TaskID, &task.Title, &task.Description)
+		err := rows.Scan(&task.TaskID, &task.Title, &task.Description, &task.EstimatedDate, &task.Done)
 
 		if err != nil {
 			return nil, err
@@ -46,7 +52,7 @@ func (repo *TodoRepository) GetAllTODO(ctx context.Context, userID int) (tasks [
 }
 
 func (repo *TodoRepository) DeleteTODO(ctx context.Context, req todo.DeleteTaskRequest) (err error) {
-	_, err = repo.DB.ExecContext(ctx, "DELETE FROM tasks WHERE id = ? AND user_id = ?", req.TaskID, req.UserID)
+	_, err = repo.DB.ExecContext(ctx, "DELETE FROM todo.tasks t WHERE t.task_id = $1 AND user_id = $2", req.TaskID, req.UserID)
 
 	if err != nil {
 		return err
@@ -54,4 +60,17 @@ func (repo *TodoRepository) DeleteTODO(ctx context.Context, req todo.DeleteTaskR
 
 	return nil
 
+}
+
+func (repo *TodoRepository) Done(ctx context.Context, req todo.DoneTaskRequest) (err error) {
+	_, err = repo.DB.ExecContext(ctx, "UPDATE todo.tasks SET done = true WHERE task_id = $1 AND user_id = $2;", req.TaskID, req.UserID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+type taskIDDTO struct {
+	TaskId int `db:"task_id"`
 }

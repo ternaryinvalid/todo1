@@ -20,6 +20,7 @@ type todoRepository interface {
 	CreateTODO(ctx context.Context, req todo.CreateTaskRequest) (id int, err error)
 	GetAllTODO(ctx context.Context, userID int) (tasks []todo.Task, err error)
 	DeleteTODO(ctx context.Context, req todo.DeleteTaskRequest) (err error)
+	Done(ctx context.Context, req todo.DoneTaskRequest) (err error)
 }
 
 type userRepository interface {
